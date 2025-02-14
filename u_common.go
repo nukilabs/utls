@@ -239,14 +239,14 @@ func (chs *ClientHelloSpec) ReadTLSExtensions(b []byte, allowBluntMimicry bool, 
 		extWriter, ok := ext.(TLSExtensionWriter)
 		if ext != nil && ok { // known extension and implements TLSExtensionWriter properly
 			switch extension {
-			case extensionPreSharedKey:
+			case ExtensionPreSharedKey:
 				// PSK extension, need to see if we do real or fake PSK
 				if realPSK {
 					extWriter = &UtlsPreSharedKeyExtension{}
 				} else {
 					extWriter = &FakePreSharedKeyExtension{}
 				}
-			case extensionSupportedVersions:
+			case ExtensionSupportedVersions:
 				chs.TLSVersMin = 0
 				chs.TLSVersMax = 0
 			}
@@ -340,7 +340,7 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 			chs.Extensions = append(chs.Extensions, &GenericExtension{extType, []byte{}})
 		} else {
 			switch extType {
-			case extensionSupportedPoints:
+			case ExtensionSupportedPoints:
 				if data["pt_fmts"] == nil {
 					return errors.New("pt_fmts is required")
 				}
@@ -348,7 +348,7 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 				if err != nil {
 					return err
 				}
-			case extensionSignatureAlgorithms:
+			case ExtensionSignatureAlgorithms:
 				if data["sig_algs"] == nil {
 					return errors.New("sig_algs is required")
 				}
@@ -356,7 +356,7 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 				if err != nil {
 					return err
 				}
-			case extensionSupportedVersions:
+			case ExtensionSupportedVersions:
 				chs.TLSVersMin = 0
 				chs.TLSVersMax = 0
 
@@ -372,7 +372,7 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 				if err != nil {
 					return err
 				}
-			case extensionSupportedCurves:
+			case ExtensionSupportedCurves:
 				if data["curves"] == nil {
 					return errors.New("curves is required")
 				}
@@ -381,7 +381,7 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 				if err != nil {
 					return err
 				}
-			case extensionALPN:
+			case ExtensionALPN:
 				if data["alpn"] == nil {
 					return errors.New("alpn is required")
 				}
@@ -390,7 +390,7 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 				if err != nil {
 					return err
 				}
-			case extensionKeyShare:
+			case ExtensionKeyShare:
 				if data["key_share"] == nil {
 					return errors.New("key_share is required")
 				}
@@ -410,7 +410,7 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 				if err != nil {
 					return err
 				}
-			case extensionPSKModes:
+			case ExtensionPSKModes:
 				if data["psk_key_exchange_modes"] == nil {
 					return errors.New("psk_key_exchange_modes is required")
 				}
@@ -445,7 +445,12 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 				if err != nil {
 					return err
 				}
-			case utlsExtensionApplicationSettings:
+			case ExtensionALPSOld:
+				// TODO: tlsfingerprint.io should record/provide application settings data
+				ext := extWriter.(*ApplicationSettingsExtension)
+				ext.CodePoint = ExtensionALPSOld
+				ext.SupportedProtocols = []string{"h2"}
+			case ExtensionALPS:
 				// TODO: tlsfingerprint.io should record/provide application settings data
 				extWriter.(*ApplicationSettingsExtension).SupportedProtocols = []string{"h2"}
 			case utlsExtensionApplicationSettingsNew:

@@ -19,25 +19,25 @@ import (
 func ExtensionFromID(id uint16) TLSExtension {
 	// deep copy
 	switch id {
-	case extensionServerName:
+	case ExtensionServerName:
 		return &SNIExtension{}
-	case extensionStatusRequest:
+	case ExtensionStatusRequest:
 		return &StatusRequestExtension{}
-	case extensionSupportedCurves:
+	case ExtensionSupportedCurves:
 		return &SupportedCurvesExtension{}
-	case extensionSupportedPoints:
+	case ExtensionSupportedPoints:
 		return &SupportedPointsExtension{}
-	case extensionSignatureAlgorithms:
+	case ExtensionSignatureAlgorithms:
 		return &SignatureAlgorithmsExtension{}
-	case extensionALPN:
+	case ExtensionALPN:
 		return &ALPNExtension{}
-	case extensionStatusRequestV2:
+	case ExtensionStatusRequestV2:
 		return &StatusRequestV2Extension{}
-	case extensionSCT:
+	case ExtensionSCT:
 		return &SCTExtension{}
 	case utlsExtensionPadding:
 		return &UtlsPaddingExtension{}
-	case extensionExtendedMasterSecret:
+	case ExtensionExtendedMasterSecret:
 		return &ExtendedMasterSecretExtension{}
 	case fakeExtensionTokenBinding:
 		return &FakeTokenBindingExtension{}
@@ -47,27 +47,27 @@ func ExtensionFromID(id uint16) TLSExtension {
 		return &FakeRecordSizeLimitExtension{}
 	case fakeExtensionDelegatedCredentials:
 		return &FakeDelegatedCredentialsExtension{}
-	case extensionSessionTicket:
+	case ExtensionSessionTicket:
 		return &SessionTicketExtension{}
-	case extensionPreSharedKey:
+	case ExtensionPreSharedKey:
 		return (PreSharedKeyExtension)(&FakePreSharedKeyExtension{}) // To use the result, caller needs further inspection to decide between Fake or Utls.
-	// case extensionEarlyData:
+	// case ExtensionEarlyData:
 	// 	return &EarlyDataExtension{}
-	case extensionSupportedVersions:
+	case ExtensionSupportedVersions:
 		return &SupportedVersionsExtension{}
-	// case extensionCookie:
+	// case ExtensionCookie:
 	// 	return &CookieExtension{}
-	case extensionPSKModes:
+	case ExtensionPSKModes:
 		return &PSKKeyExchangeModesExtension{}
-	// case extensionCertificateAuthorities:
+	// case ExtensionCertificateAuthorities:
 	// 	return &CertificateAuthoritiesExtension{}
-	case extensionSignatureAlgorithmsCert:
+	case ExtensionSignatureAlgorithmsCert:
 		return &SignatureAlgorithmsCertExtension{}
-	case extensionKeyShare:
+	case ExtensionKeyShare:
 		return &KeyShareExtension{}
-	case extensionQUICTransportParameters:
+	case ExtensionQUICTransportParameters:
 		return &QUICTransportParametersExtension{}
-	case extensionNextProtoNeg:
+	case ExtensionNextProtoNeg:
 		return &NPNExtension{}
 	case utlsExtensionApplicationSettings:
 		return &ApplicationSettingsExtension{}
@@ -79,7 +79,7 @@ func ExtensionFromID(id uint16) TLSExtension {
 		return &FakeChannelIDExtension{}
 	case utlsExtensionECH:
 		return &GREASEEncryptedClientHelloExtension{}
-	case extensionRenegotiationInfo:
+	case ExtensionRenegotiationInfo:
 		return &RenegotiationInfoExtension{}
 	default:
 		if isGREASEUint16(id) {
@@ -145,8 +145,8 @@ func (e *SNIExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 	// RFC 3546, section 3.1
-	b[0] = byte(extensionServerName >> 8)
-	b[1] = byte(extensionServerName)
+	b[0] = byte(ExtensionServerName >> 8)
+	b[1] = byte(ExtensionServerName)
 	b[2] = byte((len(hostName) + 5) >> 8)
 	b[3] = byte(len(hostName) + 5)
 	b[4] = byte((len(hostName) + 3) >> 8)
@@ -221,8 +221,8 @@ func (e *StatusRequestExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 	// RFC 4366, section 3.6
-	b[0] = byte(extensionStatusRequest >> 8)
-	b[1] = byte(extensionStatusRequest)
+	b[0] = byte(ExtensionStatusRequest >> 8)
+	b[1] = byte(ExtensionStatusRequest)
 	b[2] = 0
 	b[3] = 5
 	b[4] = 1 // OCSP type
@@ -273,8 +273,8 @@ func (e *SupportedCurvesExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 	// http://tools.ietf.org/html/rfc4492#section-5.5.1
-	b[0] = byte(extensionSupportedCurves >> 8)
-	b[1] = byte(extensionSupportedCurves)
+	b[0] = byte(ExtensionSupportedCurves >> 8)
+	b[1] = byte(ExtensionSupportedCurves)
 	b[2] = byte((2 + 2*len(e.Curves)) >> 8)
 	b[3] = byte(2 + 2*len(e.Curves))
 	b[4] = byte((2 * len(e.Curves)) >> 8)
@@ -349,8 +349,8 @@ func (e *SupportedPointsExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 	// http://tools.ietf.org/html/rfc4492#section-5.5.2
-	b[0] = byte(extensionSupportedPoints >> 8)
-	b[1] = byte(extensionSupportedPoints)
+	b[0] = byte(ExtensionSupportedPoints >> 8)
+	b[1] = byte(ExtensionSupportedPoints)
 	b[2] = byte((1 + len(e.SupportedPoints)) >> 8)
 	b[3] = byte(1 + len(e.SupportedPoints))
 	b[4] = byte(len(e.SupportedPoints))
@@ -410,8 +410,8 @@ func (e *SignatureAlgorithmsExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/rfc5246#section-7.4.1.4.1
-	b[0] = byte(extensionSignatureAlgorithms >> 8)
-	b[1] = byte(extensionSignatureAlgorithms)
+	b[0] = byte(ExtensionSignatureAlgorithms >> 8)
+	b[1] = byte(ExtensionSignatureAlgorithms)
 	b[2] = byte((2 + 2*len(e.SupportedSignatureAlgorithms)) >> 8)
 	b[3] = byte(2 + 2*len(e.SupportedSignatureAlgorithms))
 	b[4] = byte((2 * len(e.SupportedSignatureAlgorithms)) >> 8)
@@ -490,8 +490,8 @@ func (e *StatusRequestV2Extension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 	// RFC 4366, section 3.6
-	b[0] = byte(extensionStatusRequestV2 >> 8)
-	b[1] = byte(extensionStatusRequestV2)
+	b[0] = byte(ExtensionStatusRequestV2 >> 8)
+	b[1] = byte(ExtensionStatusRequestV2)
 	b[2] = 0
 	b[3] = 9
 	b[4] = 0
@@ -539,8 +539,8 @@ func (e *SignatureAlgorithmsCertExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/rfc5246#section-7.4.1.4.1
-	b[0] = byte(extensionSignatureAlgorithmsCert >> 8)
-	b[1] = byte(extensionSignatureAlgorithmsCert)
+	b[0] = byte(ExtensionSignatureAlgorithmsCert >> 8)
+	b[1] = byte(ExtensionSignatureAlgorithmsCert)
 	b[2] = byte((2 + 2*len(e.SupportedSignatureAlgorithms)) >> 8)
 	b[3] = byte(2 + 2*len(e.SupportedSignatureAlgorithms))
 	b[4] = byte((2 * len(e.SupportedSignatureAlgorithms)) >> 8)
@@ -629,8 +629,8 @@ func (e *ALPNExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 
-	b[0] = byte(extensionALPN >> 8)
-	b[1] = byte(extensionALPN & 0xff)
+	b[0] = byte(ExtensionALPN >> 8)
+	b[1] = byte(ExtensionALPN & 0xff)
 	lengths := b[2:]
 	b = b[6:]
 
@@ -851,9 +851,9 @@ func (e *SCTExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/rfc6962#section-3.3.1
-	b[0] = byte(extensionSCT >> 8)
-	b[1] = byte(extensionSCT)
-	// zero uint16 for the zero-length extension_data
+	b[0] = byte(ExtensionSCT >> 8)
+	b[1] = byte(ExtensionSCT)
+	// zero uint16 for the zero-length Extension_data
 	return e.Len(), io.EOF
 }
 
@@ -938,8 +938,8 @@ func (e *ExtendedMasterSecretExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 	// https://tools.ietf.org/html/rfc7627
-	b[0] = byte(extensionExtendedMasterSecret >> 8)
-	b[1] = byte(extensionExtendedMasterSecret)
+	b[0] = byte(ExtensionExtendedMasterSecret >> 8)
+	b[1] = byte(ExtensionExtendedMasterSecret)
 	// The length is 0
 	return e.Len(), io.EOF
 }
@@ -1244,8 +1244,8 @@ func (e *KeyShareExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 
-	b[0] = byte(extensionKeyShare >> 8)
-	b[1] = byte(extensionKeyShare)
+	b[0] = byte(ExtensionKeyShare >> 8)
+	b[1] = byte(ExtensionKeyShare)
 	keySharesLen := e.keySharesLen()
 	b[2] = byte((keySharesLen + 2) >> 8)
 	b[3] = byte(keySharesLen + 2)
@@ -1355,8 +1355,8 @@ func (e *QUICTransportParametersExtension) Read(b []byte) (int, error) {
 		return 0, io.ErrShortBuffer
 	}
 
-	b[0] = byte(extensionQUICTransportParameters >> 8)
-	b[1] = byte(extensionQUICTransportParameters)
+	b[0] = byte(ExtensionQUICTransportParameters >> 8)
+	b[1] = byte(ExtensionQUICTransportParameters)
 	// e.Len() is called before so that e.marshalResult is set
 	b[2] = byte((len(e.marshalResult)) >> 8)
 	b[3] = byte(len(e.marshalResult))
@@ -1388,8 +1388,8 @@ func (e *PSKKeyExchangeModesExtension) Read(b []byte) (int, error) {
 		return 0, errors.New("too many PSK Key Exchange modes")
 	}
 
-	b[0] = byte(extensionPSKModes >> 8)
-	b[1] = byte(extensionPSKModes)
+	b[0] = byte(ExtensionPSKModes >> 8)
+	b[1] = byte(ExtensionPSKModes)
 
 	modesLen := len(e.Modes)
 	b[2] = byte((modesLen + 1) >> 8)
@@ -1465,8 +1465,8 @@ func (e *SupportedVersionsExtension) Read(b []byte) (int, error) {
 		return 0, errors.New("too many supported versions")
 	}
 
-	b[0] = byte(extensionSupportedVersions >> 8)
-	b[1] = byte(extensionSupportedVersions)
+	b[0] = byte(ExtensionSupportedVersions >> 8)
+	b[1] = byte(ExtensionSupportedVersions)
 	b[2] = byte((extLen + 1) >> 8)
 	b[3] = byte(extLen + 1)
 	b[4] = byte(extLen)
@@ -1607,8 +1607,8 @@ func (e *NPNExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
-	b[0] = byte(extensionNextProtoNeg >> 8)
-	b[1] = byte(extensionNextProtoNeg & 0xff)
+	b[0] = byte(ExtensionNextProtoNeg >> 8)
+	b[1] = byte(ExtensionNextProtoNeg & 0xff)
 	// The length is always 0
 	return e.Len(), io.EOF
 }
@@ -1620,7 +1620,7 @@ func (e *NPNExtension) Write(_ []byte) (int, error) {
 }
 
 // draft-agl-tls-nextprotoneg-04:
-// The "extension_data" field of a "next_protocol_negotiation" extension
+// The "Extension_data" field of a "next_protocol_negotiation" extension
 // in a "ClientHello" MUST be empty.
 func (e *NPNExtension) UnmarshalJSON(_ []byte) error {
 	return nil
@@ -1653,8 +1653,8 @@ func (e *RenegotiationInfoExtension) Read(b []byte) (int, error) {
 	dataLen := len(e.RenegotiatedConnection)
 	extBodyLen := 1 + dataLen
 
-	b[0] = byte(extensionRenegotiationInfo >> 8)
-	b[1] = byte(extensionRenegotiationInfo & 0xff)
+	b[0] = byte(ExtensionRenegotiationInfo >> 8)
+	b[1] = byte(ExtensionRenegotiationInfo & 0xff)
 	b[2] = byte(extBodyLen >> 8)
 	b[3] = byte(extBodyLen)
 	b[4] = byte(dataLen)
@@ -1721,13 +1721,13 @@ func (e *FakeChannelIDExtension) Read(b []byte) (int, error) {
 	if len(b) < e.Len() {
 		return 0, io.ErrShortBuffer
 	}
-	extensionID := fakeExtensionChannelID
+	ExtensionID := fakeExtensionChannelID
 	if e.OldExtensionID {
-		extensionID = fakeOldExtensionChannelID
+		ExtensionID = fakeOldExtensionChannelID
 	}
 	// https://tools.ietf.org/html/draft-balfanz-tls-channelid-00
-	b[0] = byte(extensionID >> 8)
-	b[1] = byte(extensionID & 0xff)
+	b[0] = byte(ExtensionID >> 8)
+	b[1] = byte(ExtensionID & 0xff)
 	// The length is 0
 	return e.Len(), io.EOF
 }
