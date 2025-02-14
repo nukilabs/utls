@@ -440,7 +440,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{[]CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				&UtlsGREASEExtension{},
 				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
 			},
@@ -511,7 +514,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{[]CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				&UtlsGREASEExtension{},
 				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
 			},
@@ -582,7 +588,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{[]CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				&UtlsGREASEExtension{},
 				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
 			}),
@@ -656,7 +665,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{[]CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				&UtlsGREASEExtension{},
 				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
 			}),
@@ -728,7 +740,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{Algorithms: []CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				BoringGREASEECH(),
 				&UtlsGREASEExtension{},
 			}),
@@ -802,7 +817,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{[]CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				BoringGREASEECH(),
 				&UtlsGREASEExtension{},
 			}),
@@ -2316,7 +2334,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{[]CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				&UtlsGREASEExtension{},
 				&UtlsPreSharedKeyExtension{},
 			},
@@ -2387,7 +2408,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{[]CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				&UtlsGREASEExtension{},
 				&UtlsPreSharedKeyExtension{},
 			}),
@@ -2458,7 +2482,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{[]CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				&UtlsGREASEExtension{},
 				&UtlsPaddingExtension{GetPaddingLen: BoringPaddingStyle},
 				&UtlsPreSharedKeyExtension{},
@@ -2533,7 +2560,10 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 				&UtlsCompressCertExtension{[]CertCompressionAlgo{
 					CertCompressionBrotli,
 				}},
-				&ApplicationSettingsExtension{SupportedProtocols: []string{"h2"}},
+				&ApplicationSettingsExtension{
+					CodePoint:          ExtensionALPSOld,
+					SupportedProtocols: []string{"h2"},
+				},
 				&UtlsGREASEExtension{},
 				&UtlsPreSharedKeyExtension{},
 			}),
