@@ -118,7 +118,7 @@ func (e *TLSExtensionsJSONUnmarshaler) UnmarshalJSON(jsonStr []byte) error {
 			}
 
 			switch extID {
-			case extensionPreSharedKey:
+			case ExtensionPreSharedKey:
 				// PSK extension, need to see if we do real or fake PSK
 				if e.UseRealPSK {
 					ext = &UtlsPreSharedKeyExtension{}

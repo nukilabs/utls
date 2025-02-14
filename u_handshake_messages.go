@@ -54,17 +54,22 @@ func (m *utlsCompressedCertificateMsg) unmarshal(data []byte) bool {
 }
 
 type utlsEncryptedExtensionsMsgExtraFields struct {
-	hasApplicationSettings bool
-	applicationSettings    []byte
-	echRetryConfigs        []ECHConfig
-	customExtension        []byte
+	applicationSettingsCodePoint *uint16
+	applicationSettings          []byte
+	echRetryConfigs              []ECHConfig
+	customExtension              []byte
 }
 
 func (m *encryptedExtensionsMsg) utlsUnmarshal(extension uint16, extData cryptobyte.String) bool {
 	switch extension {
-	case utlsExtensionApplicationSettings:
-		m.utls.hasApplicationSettings = true
-		m.utls.applicationSettings = []byte(extData)
+	case ExtensionALPSOld:
+		codePoint := ExtensionALPSOld
+		m.utls.applicationSettingsCodePoint = &codePoint
+		m.utls.applicationSettings = extData
+	case ExtensionALPS:
+		codePoint := ExtensionALPS
+		m.utls.applicationSettingsCodePoint = &codePoint
+		m.utls.applicationSettings = extData
 	case utlsExtensionECH:
 		var err error
 		m.utls.echRetryConfigs, err = UnmarshalECHConfigs([]byte(extData))
@@ -76,10 +81,10 @@ func (m *encryptedExtensionsMsg) utlsUnmarshal(extension uint16, extData cryptob
 }
 
 type utlsClientEncryptedExtensionsMsg struct {
-	raw                    []byte
-	applicationSettings    []byte
-	hasApplicationSettings bool
-	customExtension        []byte
+	raw                          []byte
+	applicationSettings          []byte
+	applicationSettingsCodePoint *uint16
+	customExtension              []byte
 }
 
 func (m *utlsClientEncryptedExtensionsMsg) marshal() (x []byte, err error) {
@@ -91,8 +96,8 @@ func (m *utlsClientEncryptedExtensionsMsg) marshal() (x []byte, err error) {
 	builder.AddUint8(typeEncryptedExtensions)
 	builder.AddUint24LengthPrefixed(func(body *cryptobyte.Builder) {
 		body.AddUint16LengthPrefixed(func(extensions *cryptobyte.Builder) {
-			if m.hasApplicationSettings {
-				extensions.AddUint16(utlsExtensionApplicationSettings)
+			if m.applicationSettingsCodePoint != nil {
+				extensions.AddUint16(*m.applicationSettingsCodePoint)
 				extensions.AddUint16LengthPrefixed(func(msg *cryptobyte.Builder) {
 					msg.AddBytes(m.applicationSettings)
 				})
@@ -129,8 +134,13 @@ func (m *utlsClientEncryptedExtensionsMsg) unmarshal(data []byte) bool {
 		}
 
 		switch extension {
-		case utlsExtensionApplicationSettings:
-			m.hasApplicationSettings = true
+		case ExtensionALPSOld:
+			codePoint := ExtensionALPSOld
+			m.applicationSettingsCodePoint = &codePoint
+			m.applicationSettings = []byte(extData)
+		case ExtensionALPS:
+			codePoint := ExtensionALPS
+			m.applicationSettingsCodePoint = &codePoint
 			m.applicationSettings = []byte(extData)
 		default:
 			// Unknown extensions are illegal in EncryptedExtensions.
