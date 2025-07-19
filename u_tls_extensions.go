@@ -1558,8 +1558,8 @@ func (e *CookieExtension) Read(b []byte) (int, error) {
 	}
 
 	// Extension type
-	b[0] = byte(extensionCookie >> 8)
-	b[1] = byte(extensionCookie)
+	b[0] = byte(ExtensionCookie >> 8)
+	b[1] = byte(ExtensionCookie)
 
 	// Copied from BoringSSL https://boringssl.googlesource.com/boringssl.git/%2B/chromium-stable/ssl/extensions.cc#2465
 	// Total extension_data length

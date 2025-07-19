@@ -32,7 +32,7 @@ const (
 
 // TLS
 const (
-	extensionNextProtoNeg uint16 = 13172 // not IANA assigned. Removed by crypto/tls since Nov 2019
+	ExtensionNextProtoNeg uint16 = 13172 // not IANA assigned. Removed by crypto/tls since Nov 2019
 
 	utlsExtensionPadding                uint16 = 21
 	utlsExtensionCompressCertificate    uint16 = 27     // https://datatracker.ietf.org/doc/html/rfc8879#section-7.1
@@ -445,17 +445,12 @@ func (chs *ClientHelloSpec) ImportTLSClientHello(data map[string][]byte) error {
 				if err != nil {
 					return err
 				}
-			case ExtensionALPSOld:
-				// TODO: tlsfingerprint.io should record/provide application settings data
-				ext := extWriter.(*ApplicationSettingsExtension)
-				ext.CodePoint = ExtensionALPSOld
-				ext.SupportedProtocols = []string{"h2"}
-			case ExtensionALPS:
+			case utlsExtensionApplicationSettings:
 				// TODO: tlsfingerprint.io should record/provide application settings data
 				extWriter.(*ApplicationSettingsExtension).SupportedProtocols = []string{"h2"}
 			case utlsExtensionApplicationSettingsNew:
 				extWriter.(*ApplicationSettingsExtensionNew).SupportedProtocols = []string{"h2"}
-			case extensionPreSharedKey:
+			case ExtensionPreSharedKey:
 				log.Printf("[Warning] PSK extension added without data")
 			default:
 				if !isGREASEUint16(extType) {
