@@ -31,9 +31,9 @@ import (
 
 	"golang.org/x/crypto/cryptobyte"
 
-	"github.com/refraction-networking/utls/internal/fips140tls"
-	"github.com/refraction-networking/utls/internal/hpke"
-	"github.com/refraction-networking/utls/testenv"
+	"github.com/nukilabs/utls/internal/fips140tls"
+	"github.com/nukilabs/utls/internal/hpke"
+	"github.com/nukilabs/utls/testenv"
 )
 
 var rsaCertPEM = `-----BEGIN CERTIFICATE-----
@@ -2100,7 +2100,7 @@ func testECHSpec(t *testing.T, spec *ClientHelloSpec, expectSuccess bool) {
 
 	marshalECHConfig := func(id uint8, pubKey []byte, publicName string, maxNameLen uint8) []byte {
 		builder := cryptobyte.NewBuilder(nil)
-		builder.AddUint16(extensionEncryptedClientHello)
+		builder.AddUint16(ExtensionEncryptedClientHello)
 		builder.AddUint16LengthPrefixed(func(builder *cryptobyte.Builder) {
 			builder.AddUint8(id)
 			builder.AddUint16(hpke.DHKEM_X25519_HKDF_SHA256) // The only DHKEM we support

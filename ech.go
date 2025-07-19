@@ -11,7 +11,7 @@ import (
 	"slices"
 	"strings"
 
-	"github.com/refraction-networking/utls/internal/hpke"
+	"github.com/nukilabs/utls/internal/hpke"
 
 	"golang.org/x/crypto/cryptobyte"
 )
@@ -69,7 +69,7 @@ func parseECHConfig(enc []byte) (skip bool, ec echConfig, err error) {
 		return false, echConfig{}, errMalformedECHConfig
 	}
 	ec.raw = ec.raw[:ec.Length+4]
-	if ec.Version != extensionEncryptedClientHello {
+	if ec.Version != ExtensionEncryptedClientHello {
 		s.Skip(int(ec.Length))
 		return true, echConfig{}, nil
 	}
@@ -337,7 +337,7 @@ func decodeInnerClientHello(outer *clientHelloMsg, encoded []byte) (*clientHello
 					recon.SetError(errors.New("tls: invalid inner client hello"))
 					return
 				}
-				if extension == extensionECHOuterExtensions {
+				if extension == ExtensionECHOuterExtensions {
 					if !extData.ReadUint8LengthPrefixed(&extData) {
 						recon.SetError(errors.New("tls: invalid inner client hello"))
 						return
@@ -349,7 +349,7 @@ func decodeInnerClientHello(outer *clientHelloMsg, encoded []byte) (*clientHello
 							recon.SetError(errors.New("tls: invalid inner client hello"))
 							return
 						}
-						if extType == extensionEncryptedClientHello {
+						if extType == ExtensionEncryptedClientHello {
 							recon.SetError(errors.New("tls: invalid outer extensions"))
 							return
 						}

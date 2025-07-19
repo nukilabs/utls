@@ -441,7 +441,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				&UtlsGREASEExtension{},
@@ -515,7 +514,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				&UtlsGREASEExtension{},
@@ -589,7 +587,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				&UtlsGREASEExtension{},
@@ -666,7 +663,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				&UtlsGREASEExtension{},
@@ -741,7 +737,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				BoringGREASEECH(),
@@ -818,7 +813,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				BoringGREASEECH(),
@@ -2480,7 +2474,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				&UtlsGREASEExtension{},
@@ -2554,7 +2547,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				&UtlsGREASEExtension{},
@@ -2628,7 +2620,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				&UtlsGREASEExtension{},
@@ -2706,7 +2697,6 @@ func utlsIdToSpec(id ClientHelloID) (ClientHelloSpec, error) {
 					CertCompressionBrotli,
 				}},
 				&ApplicationSettingsExtension{
-					CodePoint:          ExtensionALPSOld,
 					SupportedProtocols: []string{"h2"},
 				},
 				&UtlsGREASEExtension{},
