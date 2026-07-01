@@ -1,6 +1,6 @@
 module github.com/nukilabs/utls
 
-go 1.25
+go 1.26
 
 retract (
 	v1.4.1 // #218
@@ -8,11 +8,11 @@ retract (
 )
 
 require (
-	github.com/andybalholm/brotli v1.2.0
-	github.com/klauspost/compress v1.18.0
-	golang.org/x/crypto v0.42.0
-	golang.org/x/net v0.44.0
-	golang.org/x/sys v0.36.0
+	github.com/andybalholm/brotli v1.2.2
+	github.com/klauspost/compress v1.19.0
+	golang.org/x/crypto v0.53.0
+	golang.org/x/net v0.55.0
+	golang.org/x/sys v0.46.0
 )
 
-require golang.org/x/text v0.29.0 // indirect
+require golang.org/x/text v0.38.0 // indirect
