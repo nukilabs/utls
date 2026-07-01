@@ -113,6 +113,12 @@ var (
 	FakeSHA1WithDSA   SignatureScheme = 0x0202
 	FakeSHA256WithDSA SignatureScheme = 0x0402
 
+	// ML-DSA (FIPS 204) signature schemes, advertised by Chrome 150+.
+	// https://datatracker.ietf.org/doc/draft-ietf-tls-mldsa/
+	FakeMLDSA44 SignatureScheme = 0x0904
+	FakeMLDSA65 SignatureScheme = 0x0905
+	FakeMLDSA87 SignatureScheme = 0x0906
+
 	// fakeEd25519 = SignatureAndHash{0x08, 0x07}
 	// fakeEd448 = SignatureAndHash{0x08, 0x08}
 )
