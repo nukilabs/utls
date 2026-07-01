@@ -1977,18 +1977,18 @@ func TestHandshakeMLKEM(t *testing.T) {
 				t.Fatal(err)
 			}
 			if test.expectMLKEM {
-				if ss.testingOnlyCurveID != X25519MLKEM768 {
-					t.Errorf("got CurveID %v (server), expected %v", ss.testingOnlyCurveID, X25519MLKEM768)
+				if ss.CurveID != X25519MLKEM768 {
+					t.Errorf("got CurveID %v (server), expected %v", ss.CurveID, X25519MLKEM768)
 				}
-				if cs.testingOnlyCurveID != X25519MLKEM768 {
-					t.Errorf("got CurveID %v (client), expected %v", cs.testingOnlyCurveID, X25519MLKEM768)
+				if cs.CurveID != X25519MLKEM768 {
+					t.Errorf("got CurveID %v (client), expected %v", cs.CurveID, X25519MLKEM768)
 				}
 			} else {
-				if ss.testingOnlyCurveID == X25519MLKEM768 {
-					t.Errorf("got CurveID %v (server), expected not X25519MLKEM768", ss.testingOnlyCurveID)
+				if ss.CurveID == X25519MLKEM768 {
+					t.Errorf("got CurveID %v (server), expected not X25519MLKEM768", ss.CurveID)
 				}
-				if cs.testingOnlyCurveID == X25519MLKEM768 {
-					t.Errorf("got CurveID %v (client), expected not X25519MLKEM768", cs.testingOnlyCurveID)
+				if cs.CurveID == X25519MLKEM768 {
+					t.Errorf("got CurveID %v (client), expected not X25519MLKEM768", cs.CurveID)
 				}
 			}
 			if test.expectHRR {
@@ -2005,6 +2005,76 @@ func TestHandshakeMLKEM(t *testing.T) {
 				if cs.testingOnlyDidHRR {
 					t.Error("client used HRR")
 				}
+			}
+		})
+	}
+}
+
+// TestConnectionStateCurveID verifies that ConnectionState.CurveID reports the
+// negotiated key exchange group on both client and server, across TLS 1.2 and
+// TLS 1.3, and is zero for a legacy RSA key exchange that uses no curve.
+func TestConnectionStateCurveID(t *testing.T) {
+	tests := []struct {
+		name         string
+		maxVersion   uint16
+		cipherSuites []uint16 // TLS 1.2 cipher suites, nil for defaults
+		curve        CurveID  // curve to pin, 0 to leave defaults
+		expected     CurveID
+	}{
+		{
+			name:       "TLS13_P384",
+			maxVersion: VersionTLS13,
+			curve:      CurveP384,
+			expected:   CurveP384,
+		},
+		{
+			name:       "TLS13_X25519MLKEM768",
+			maxVersion: VersionTLS13,
+			curve:      X25519MLKEM768,
+			expected:   X25519MLKEM768,
+		},
+		{
+			name:         "TLS12_ECDHE_P384",
+			maxVersion:   VersionTLS12,
+			cipherSuites: []uint16{TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256},
+			curve:        CurveP384,
+			expected:     CurveP384,
+		},
+		{
+			name:         "TLS12_RSA_NoCurve",
+			maxVersion:   VersionTLS12,
+			cipherSuites: []uint16{TLS_RSA_WITH_AES_128_GCM_SHA256},
+			expected:     0,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.name, func(t *testing.T) {
+			if test.curve == X25519MLKEM768 {
+				skipFIPS(t) // No X25519MLKEM768 in FIPS
+			}
+			clientConfig := testConfig.Clone()
+			clientConfig.MaxVersion = test.maxVersion
+			serverConfig := testConfig.Clone()
+			serverConfig.MaxVersion = test.maxVersion
+			if test.cipherSuites != nil {
+				clientConfig.CipherSuites = test.cipherSuites
+				serverConfig.CipherSuites = test.cipherSuites
+			}
+			if test.curve != 0 {
+				clientConfig.CurvePreferences = []CurveID{test.curve}
+				serverConfig.CurvePreferences = []CurveID{test.curve}
+			}
+
+			ss, cs, err := testHandshake(t, clientConfig, serverConfig)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if ss.CurveID != test.expected {
+				t.Errorf("got CurveID %v (server), expected %v", ss.CurveID, test.expected)
+			}
+			if cs.CurveID != test.expected {
+				t.Errorf("got CurveID %v (client), expected %v", cs.CurveID, test.expected)
 			}
 		})
 	}

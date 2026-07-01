@@ -310,12 +310,13 @@ type ConnectionState struct {
 	// ekm is a closure exposed via ExportKeyingMaterial.
 	ekm func(label string, context []byte, length int) ([]byte, error)
 
+	// CurveID is the key exchange mechanism used for the connection. The name
+	// refers to elliptic curves for legacy reasons, see [CurveID]. If a legacy
+	// RSA key exchange is used, this value is zero.
+	CurveID CurveID
+
 	// testingOnlyDidHRR is true if a HelloRetryRequest was sent/received.
 	testingOnlyDidHRR bool
-
-	// testingOnlyCurveID is the selected CurveID, or zero if an RSA exchanges
-	// is performed.
-	testingOnlyCurveID CurveID
 }
 
 // ExportKeyingMaterial returns length bytes of exported key material in a new
