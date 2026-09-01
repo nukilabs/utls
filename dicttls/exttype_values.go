@@ -67,11 +67,12 @@ const (
 
 // Not IANA assigned
 const (
-	ExtType_next_protocol_negotiation uint16 = 13172 // https://datatracker.ietf.org/doc/html/draft-agl-tls-nextprotoneg-04
-	ExtType_application_settings      uint16 = 17513 // https://www.ietf.org/archive/id/draft-vvv-tls-alps-01.html
-	ExtType_application_settings_new  uint16 = 17613 // https://www.ietf.org/archive/id/draft-vvv-tls-alps-01.html
-	ExtType_channel_id_old            uint16 = 30031 // https://datatracker.ietf.org/doc/html/draft-balfanz-tls-channelid-01
-	ExtType_channel_id                uint16 = 30032 // https://datatracker.ietf.org/doc/html/draft-balfanz-tls-channelid-01
+	ExtType_next_protocol_negotiation uint16 = 13172  // https://datatracker.ietf.org/doc/html/draft-agl-tls-nextprotoneg-04
+	ExtType_application_settings      uint16 = 17513  // https://www.ietf.org/archive/id/draft-vvv-tls-alps-01.html
+	ExtType_application_settings_new  uint16 = 17613  // https://www.ietf.org/archive/id/draft-vvv-tls-alps-01.html
+	ExtType_channel_id_old            uint16 = 30031  // https://datatracker.ietf.org/doc/html/draft-balfanz-tls-channelid-01
+	ExtType_channel_id                uint16 = 30032  // https://datatracker.ietf.org/doc/html/draft-balfanz-tls-channelid-01
+	ExtType_trust_anchors             uint16 = 0xca34 // https://datatracker.ietf.org/doc/draft-ietf-tls-trust-anchor-ids/
 )
 
 var DictExtTypeValueIndexed = map[uint16]string{
@@ -140,6 +141,7 @@ var DictExtTypeValueIndexed = map[uint16]string{
 	17613: "application_settings_new",
 	30031: "channel_id_old",
 	30032: "channel_id",
+	51764: "trust_anchors",
 }
 
 var DictExtTypeNameIndexed = map[string]uint16{
@@ -209,4 +211,5 @@ var DictExtTypeNameIndexed = map[string]uint16{
 	"application_settings_new":  17613,
 	"channel_id_old":            30031,
 	"channel_id":                30032,
+	"trust_anchors":             51764,
 }

@@ -41,6 +41,7 @@ const (
 	utlsFakeExtensionCustom             uint16 = 1234   // not IANA assigned, for ALPS
 	utlsExtensionECH                    uint16 = 0xfe0d // draft-ietf-tls-esni-17
 	utlsExtensionECHOuterExtensions     uint16 = 0xfd00 // draft-ietf-tls-esni-17
+	utlsExtensionTrustAnchors           uint16 = 0xca34 // draft-ietf-tls-trust-anchor-ids, BoringSSL codepoint
 
 	// extensions with 'fake' prefix break connection, if server echoes them back
 	fakeExtensionEncryptThenMAC       uint16 = 22

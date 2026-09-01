@@ -81,6 +81,8 @@ func ExtensionFromID(id uint16) TLSExtension {
 		return &GREASEEncryptedClientHelloExtension{}
 	case ExtensionRenegotiationInfo:
 		return &RenegotiationInfoExtension{}
+	case utlsExtensionTrustAnchors:
+		return &TrustAnchorsExtension{}
 	default:
 		if isGREASEUint16(id) {
 			return &UtlsGREASEExtension{}
@@ -835,6 +837,125 @@ func (e *ApplicationSettingsExtensionNew) Write(b []byte) (int, error) {
 	)
 	e.SupportedProtocols, fullLen, err = e.applicationSettingsExtension.Write(b)
 	return fullLen, err
+}
+
+// TrustAnchorsExtension implements trust_anchors (0xca34), from
+// draft-ietf-tls-trust-anchor-ids. Chrome 141+ sends it by default, gated on the
+// TLSTrustAnchorIDs feature.
+//
+// What Chrome puts in the list depends on the milestone. Chrome 141 to 151 only
+// learned candidate anchors from a DNS hint, and sent an empty list when it had none,
+// which was the common case. Chrome 152 turned on the NonMtcTrustAnchorIDs feature as
+// well, so it now advertises the identifiers of its own root store: a captured Chrome
+// 152 ClientHello carries 28 of them.
+//
+// A nil or empty TrustAnchors still emits the extension, putting six bytes on the
+// wire: ca34 0002 0000. That matches Chrome 141 to 151, not Chrome 152 and later.
+//
+// This extension only advertises identifiers. uTLS does not implement the rest of
+// trust anchor negotiation, so a server that answers with its own trust_anchors in
+// EncryptedExtensions is ignored, and the handshake proceeds normally.
+type TrustAnchorsExtension struct {
+	// TrustAnchors holds the requested trust anchor identifiers, each a relative
+	// object identifier in the base 128 encoding of the draft. Each identifier must
+	// be 1 to 255 bytes long.
+	TrustAnchors [][]byte
+}
+
+func (e *TrustAnchorsExtension) writeToUConn(*UConn) error {
+	return nil
+}
+
+func (e *TrustAnchorsExtension) listLen() int {
+	length := 0
+	for _, id := range e.TrustAnchors {
+		length += 1 + len(id)
+	}
+	return length
+}
+
+func (e *TrustAnchorsExtension) Len() int {
+	return 4 + 2 + e.listLen()
+}
+
+func (e *TrustAnchorsExtension) Read(b []byte) (int, error) {
+	if len(b) < e.Len() {
+		return 0, io.ErrShortBuffer
+	}
+
+	listLen := e.listLen()
+	if listLen > 0xffff-2 {
+		return 0, errors.New("trust anchors extension is too long")
+	}
+
+	b[0] = byte(utlsExtensionTrustAnchors >> 8)
+	b[1] = byte(utlsExtensionTrustAnchors & 0xff)
+	// Extension data length, which covers the list length field as well.
+	b[2] = byte((listLen + 2) >> 8)
+	b[3] = byte(listLen + 2)
+	// Trust anchor list length.
+	b[4] = byte(listLen >> 8)
+	b[5] = byte(listLen)
+
+	i := 6
+	for _, id := range e.TrustAnchors {
+		// An empty identifier is a decode error for the peer, see
+		// ssl_is_valid_trust_anchor_list in BoringSSL.
+		if len(id) == 0 {
+			return 0, errors.New("trust anchor identifier is empty")
+		}
+		if len(id) > 255 {
+			return 0, errors.New("trust anchor identifier is too long")
+		}
+		b[i] = byte(len(id))
+		i++
+		i += copy(b[i:], id)
+	}
+
+	return e.Len(), io.EOF
+}
+
+func (e *TrustAnchorsExtension) Write(b []byte) (int, error) {
+	fullLen := len(b)
+	extData := cryptobyte.String(b)
+
+	var list cryptobyte.String
+	if !extData.ReadUint16LengthPrefixed(&list) {
+		return 0, errors.New("unable to read trust anchors extension data")
+	}
+
+	trustAnchors := [][]byte{}
+	for !list.Empty() {
+		var id cryptobyte.String
+		if !list.ReadUint8LengthPrefixed(&id) || len(id) == 0 {
+			return 0, errors.New("unable to read trust anchor identifier")
+		}
+		trustAnchors = append(trustAnchors, append([]byte(nil), id...))
+	}
+	e.TrustAnchors = trustAnchors
+
+	return fullLen, nil
+}
+
+func (e *TrustAnchorsExtension) UnmarshalJSON(b []byte) error {
+	var trustAnchors struct {
+		TrustAnchors [][]uint8 `json:"trust_anchors"`
+	}
+	if err := json.Unmarshal(b, &trustAnchors); err != nil {
+		return err
+	}
+
+	for _, id := range trustAnchors.TrustAnchors {
+		if len(id) == 0 {
+			return errors.New("trust anchor identifier is empty")
+		}
+		if len(id) > 255 {
+			return errors.New("trust anchor identifier is too long")
+		}
+	}
+	e.TrustAnchors = trustAnchors.TrustAnchors
+
+	return nil
 }
 
 // SCTExtension implements signed_certificate_timestamp (18)
