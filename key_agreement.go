@@ -327,6 +327,10 @@ func (ka *ecdheKeyAgreement) processServerKeyExchange(config *Config, clientHell
 			return errServerKeyExchange
 		}
 
+		switch signatureAlgorithm {
+		case MLDSA44, MLDSA65, MLDSA87:
+			return errors.New("tls: server selected ML-DSA with TLS version < 1.3")
+		}
 		if !isSupportedSignatureAlgorithm(signatureAlgorithm, clientHello.supportedSignatureAlgorithms) {
 			return errors.New("tls: certificate used with invalid signature algorithm")
 		}

@@ -207,6 +207,7 @@ const (
 	signatureECDSA
 	signatureEd25519
 	signatureEdDilithium3
+	signatureMLDSA
 )
 
 // directSigning is a standard Hash value that signals that no pre-hashing
@@ -415,6 +416,12 @@ const (
 	// EdDSA algorithms.
 	Ed25519 SignatureScheme = 0x0807
 
+	// ML-DSA signature algorithms (FIPS 204, RFC 9881). These codepoints are
+	// defined for TLS 1.3 only.
+	MLDSA44 SignatureScheme = 0x0904
+	MLDSA65 SignatureScheme = 0x0905
+	MLDSA87 SignatureScheme = 0x0906
+
 	// Legacy signature and hash algorithms for TLS 1.2.
 	PKCS1WithSHA1 SignatureScheme = 0x0201
 	ECDSAWithSHA1 SignatureScheme = 0x0203
@@ -554,6 +561,14 @@ type Config struct {
 	// If Rand is nil, TLS uses the cryptographic random reader in package
 	// crypto/rand.
 	// The Reader must be safe for use by multiple goroutines.
+	//
+	// [uTLS] As of Go 1.27, crypto/ecdh, crypto/ecdsa and crypto/rsa ignore a
+	// caller-supplied reader and use the system source instead. Rand therefore
+	// no longer determines the ECDHE key shares or the signature nonces, only
+	// the values this package reads directly, such as the ClientHello random
+	// and the session id. Set GODEBUG=cryptocustomrand=1, or a //go:debug
+	// cryptocustomrand=1 line in package main, to restore the old behaviour;
+	// this matters only if you rely on Rand to reproduce a handshake.
 	Rand io.Reader
 
 	// Time returns the current time as the number of seconds since the epoch.
