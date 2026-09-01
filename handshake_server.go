@@ -174,7 +174,7 @@ func (c *Conn) readClientHello(ctx context.Context) (*clientHelloMsg, *echServer
 	if len(clientHello.supportedVersions) == 0 {
 		clientVersions = supportedVersionsFromMax(clientHello.vers)
 	}
-	c.vers, ok = c.config.mutualVersion(roleServer, clientVersions)
+	c.vers, ok = c.config.mutualVersion(roleServer, c.quic != nil, clientVersions)
 	if !ok {
 		c.sendAlert(alertProtocolVersion)
 		return nil, nil, fmt.Errorf("tls: client offered only unsupported versions: %x", clientVersions)
@@ -229,7 +229,7 @@ func (hs *serverHandshakeState) processClientHello() error {
 	hs.hello.random = make([]byte, 32)
 	serverRandom := hs.hello.random
 	// Downgrade protection canaries. See RFC 8446, Section 4.1.3.
-	maxVers := c.config.maxSupportedVersion(roleServer)
+	maxVers := c.config.maxSupportedVersion(roleServer, c.quic != nil)
 	if maxVers >= VersionTLS12 && c.vers < maxVers || testingOnlyForceDowngradeCanary {
 		if c.vers == VersionTLS12 {
 			copy(serverRandom[24:], downgradeCanaryTLS12)
@@ -421,7 +421,7 @@ func (hs *serverHandshakeState) pickCipherSuite() error {
 	for _, id := range hs.clientHello.cipherSuites {
 		if id == TLS_FALLBACK_SCSV {
 			// The client is doing a fallback connection. See RFC 7507.
-			if hs.clientHello.vers < c.config.maxSupportedVersion(roleServer) {
+			if hs.clientHello.vers < c.config.maxSupportedVersion(roleServer, c.quic != nil) {
 				c.sendAlert(alertInappropriateFallback)
 				return errors.New("tls: client using inappropriate protocol fallback")
 			}
@@ -999,6 +999,10 @@ func clientHelloInfo(ctx context.Context, c *Conn, clientHello *clientHelloMsg) 
 		supportedVersions = supportedVersionsFromMax(clientHello.vers)
 	}
 
+	conn := c.conn
+	if c.quic != nil {
+		conn = c.quic.clientHelloInfoConn
+	}
 	return &ClientHelloInfo{
 		CipherSuites:      clientHello.cipherSuites,
 		ServerName:        clientHello.serverName,
@@ -1008,8 +1012,10 @@ func clientHelloInfo(ctx context.Context, c *Conn, clientHello *clientHelloMsg) 
 		SupportedProtos:   clientHello.alpnProtocols,
 		SupportedVersions: supportedVersions,
 		Extensions:        clientHello.extensions,
-		Conn:              c.conn,
+		Conn:              conn,
+		HelloRetryRequest: c.didHRR,
 		config:            c.config,
 		ctx:               ctx,
+		isQUIC:            c.quic != nil,
 	}
 }

@@ -480,12 +480,20 @@ type ClientHelloInfo struct {
 	// connection to fail.
 	Conn net.Conn
 
+	// HelloRetryRequest indicates whether the ClientHello was sent in response
+	// to a HelloRetryRequest message.
+	HelloRetryRequest bool
+
 	// config is embedded by the GetCertificate or GetConfigForClient caller,
 	// for use with SupportsCertificate.
 	config *Config
 
 	// ctx is the context of the handshake that is in progress.
 	ctx context.Context
+
+	// isQUIC indicates whether the connection is a QUIC connection, which
+	// restricts the usable protocol versions to TLS 1.3 and above.
+	isQUIC bool
 }
 
 // Context returns the context of the handshake that is in progress.
@@ -1215,7 +1223,7 @@ const roleServer = false
 
 // var tls10server = godebug.New("tls10server") // [UTLS] unsupported
 
-func (c *Config) supportedVersions(isClient bool) []uint16 {
+func (c *Config) supportedVersions(isClient, isQUIC bool) []uint16 {
 	versions := make([]uint16, 0, len(supportedVersions))
 	for _, v := range supportedVersions {
 		// [uTLS] SECTION BEGIN
@@ -1243,13 +1251,16 @@ func (c *Config) supportedVersions(isClient bool) []uint16 {
 		if c != nil && c.MaxVersion != 0 && v > c.MaxVersion {
 			continue
 		}
+		if isQUIC && v < VersionTLS13 {
+			continue
+		}
 		versions = append(versions, v)
 	}
 	return versions
 }
 
-func (c *Config) maxSupportedVersion(isClient bool) uint16 {
-	supportedVersions := c.supportedVersions(isClient)
+func (c *Config) maxSupportedVersion(isClient, isQUIC bool) uint16 {
+	supportedVersions := c.supportedVersions(isClient, isQUIC)
 	if len(supportedVersions) == 0 {
 		return 0
 	}
@@ -1301,8 +1312,8 @@ func (c *Config) supportsCurve(version uint16, curve CurveID) bool {
 
 // mutualVersion returns the protocol version to use given the advertised
 // versions of the peer. Priority is given to the peer preference order.
-func (c *Config) mutualVersion(isClient bool, peerVersions []uint16) (uint16, bool) {
-	supportedVersions := c.supportedVersions(isClient)
+func (c *Config) mutualVersion(isClient, isQUIC bool, peerVersions []uint16) (uint16, bool) {
+	supportedVersions := c.supportedVersions(isClient, isQUIC)
 	for _, peerVersion := range peerVersions {
 		for _, v := range supportedVersions {
 			if v == peerVersion {
@@ -1390,7 +1401,7 @@ func (chi *ClientHelloInfo) SupportsCertificate(c *Certificate) error {
 	if config == nil {
 		config = &Config{}
 	}
-	vers, ok := config.mutualVersion(roleServer, chi.SupportedVersions)
+	vers, ok := config.mutualVersion(roleServer, chi.isQUIC, chi.SupportedVersions)
 	if !ok {
 		return errors.New("no mutually supported protocol versions")
 	}
