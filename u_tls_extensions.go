@@ -462,8 +462,11 @@ func (e *SignatureAlgorithmsExtension) Write(b []byte) (int, error) {
 		if !sigAndAlgs.ReadUint16(&sigAndAlg) {
 			return 0, errors.New("unable to read signature algorithms extension data")
 		}
+		// Chrome 152 and later GREASE this list. Normalise it the way the cipher suite
+		// list is normalised, so two captures of the same client yield the same spec;
+		// ApplyPreset re-GREASEs it per connection.
 		supportedSignatureAlgorithms = append(
-			supportedSignatureAlgorithms, SignatureScheme(sigAndAlg))
+			supportedSignatureAlgorithms, SignatureScheme(unGREASEUint16(sigAndAlg)))
 	}
 	e.SupportedSignatureAlgorithms = supportedSignatureAlgorithms
 	return fullLen, nil
@@ -1087,7 +1090,12 @@ const (
 	ssl_grease_extension2
 	ssl_grease_version
 	ssl_grease_ticket_extension
-	ssl_grease_last_index = ssl_grease_ticket_extension
+	ssl_grease_ech_config_id
+	ssl_grease_signature_algorithm
+	// ssl_grease_last_index is used as the size of the seed array, so it has to stay one
+	// past the last index above. BoringSSL aliases its own last enumerator to the final
+	// index instead, so the two differ by one by design.
+	ssl_grease_last_index
 )
 
 // it is responsibility of user not to generate multiple grease extensions with same value

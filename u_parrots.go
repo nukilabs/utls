@@ -3288,6 +3288,15 @@ func (uconn *UConn) ApplyPreset(p *ClientHelloSpec) error {
 					ext.Curves[i] = CurveID(GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_group))
 				}
 			}
+		case *SignatureAlgorithmsExtension:
+			// Chrome 152 is the first release to GREASE signature_algorithms. BoringSSL
+			// draws it from ssl_grease_signature_algorithm, so the value is independent of
+			// the one used for the cipher suite list.
+			for i := range ext.SupportedSignatureAlgorithms {
+				if isGREASEUint16(uint16(ext.SupportedSignatureAlgorithms[i])) {
+					ext.SupportedSignatureAlgorithms[i] = SignatureScheme(GetBoringGREASEValue(uconn.greaseSeed, ssl_grease_signature_algorithm))
+				}
+			}
 		case *KeyShareExtension:
 			preferredCurveIsSet := false
 			reusableClassicalKeys := make(map[CurveID][]*ecdh.PrivateKey)
